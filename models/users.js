@@ -36,4 +36,13 @@ const userSchema = Schema({
     }
 });
 
+//esta funcion me permite sobreescribir el equipo o las caracteristicas de cada de uno de los parametros
+//en una funcion de flecha no podemos usar this, por eso esta funcion es normal
+userSchema.methods.toJSON = function(){
+    // estoy desestructurando el objeto en sus componentes, { version, el campo que quiero modificar, el campo donde quiero aconglomerar todo}
+    const { __v, password, ...user } = this.toObject();
+    return user;
+}
+
+//exports
 module.exports = model('User', userSchema);

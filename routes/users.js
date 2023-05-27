@@ -3,7 +3,7 @@ const { Router } = require('express'); // desestrcuturamos de express la funcion
 const { usersGet, usersPut, usersPOST, usersDelete, usersPatch } = require('../controllers/users');
 const { check } = require('express-validator');
 const { validateFields } = require('../middleware/middleware');
-const { roleIsValid } = require('../helpers/db-validators');
+const { roleIsValid, emailIsValid } = require('../helpers/db-validators');
 const { Error } = require('mongoose');
 //end require
 
@@ -23,6 +23,7 @@ router.post('/', [
     check('name', 'nombre no puede estar vacio').notEmpty().escape(),
     check('password', 'password obligatorio').notEmpty().isLength({ min:6 }), 
     check('email', 'correo no es valido').isEmail().escape(),
+    check('email', 'Correo ya existe').custom((email) => emailIsValid(email)).escape(),
     //check('role', 'no es un rol permitido').isIn(['ADMIN_ROLE', 'MOD_ROLE']),
     //Para validar desde la DB podemos usar custom lo que permite crear una validacion personalizada, asignamos un valor por defecto al rol en caso de que no tenga
     /*check('role').custom( async(role = '' ) =>{

@@ -4,6 +4,7 @@ const bcryptjs = require('bcryptjs')
 const User = require('../models/users'); // es un estandar que se importe con la primera letra en mayus
 const { validationResult } = require('express-validator');
 const { validateFields } = require('../middleware/middleware');
+const { emailIsValid } = require('../helpers/db-validators');
 //end requires
 
 //creamos los controladores para cada una de las rutas
@@ -44,12 +45,12 @@ const usersPOST = async (req, res = response) => {// aqui yo no tengo el app, po
     // const user = new User(body) (De esta forma enviamos el body completo)
     const user = new User({ name, password, email, role }); // aqui enviamos solo los datos que requerimos desestructurados
     //verificamos si el correo existe
-    const emailExist = await User.findOne({ email });
+    /*const emailExist = await User.findOne({ email });
     if(emailExist){
         return res.status(400).json({
             msg:'Correo ya existe'
         })
-    }
+    }*/
     //creamos un salt: numero de vueltas para generar la encriptacion
     const salt = bcryptjs.genSaltSync();
     user.password = bcryptjs.hashSync( password, salt ); //hash es para encriptarlo en una sola via
