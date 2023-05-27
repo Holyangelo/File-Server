@@ -3,7 +3,7 @@ const { Router } = require('express'); // desestrcuturamos de express la funcion
 const { usersGet, usersPut, usersPOST, usersDelete, usersPatch } = require('../controllers/users');
 const { check } = require('express-validator');
 const { validateFields } = require('../middleware/middleware');
-const Role = require('../models/roles');
+const { roleIsValid } = require('../helpers/db-validators');
 const { Error } = require('mongoose');
 //end require
 
@@ -25,12 +25,13 @@ router.post('/', [
     check('email', 'correo no es valido').isEmail().escape(),
     //check('role', 'no es un rol permitido').isIn(['ADMIN_ROLE', 'MOD_ROLE']),
     //Para validar desde la DB podemos usar custom lo que permite crear una validacion personalizada, asignamos un valor por defecto al rol en caso de que no tenga
-    check('role').custom( async(role = '' ) =>{
+    /*check('role').custom( async(role = '' ) =>{
         const existRole = await Role.findOne({ role });// findOne me sirve para buscar un objeto dentro de una clase o para buscar dentro de un elemento otro elemento.
         if( !existRole ){
             throw new Error(`El rol ${role} ingresado no es valido`);
         }
-    }),
+    }),*/
+    check('role').custom((role) => roleIsValid(role)),
     validateFields
 ], usersPOST); // cuando queremos realizar el envio de un middleware podemos hacerlo a traves de la ruta
 // en este caso el check es una funcion del express-validator y se usa para comprobar si algo es valido o no check(campo a comprobar, mensaje de salida)
