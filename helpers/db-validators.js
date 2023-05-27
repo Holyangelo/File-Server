@@ -17,7 +17,7 @@ const emailIsValid = async(email = '') => {
         /*return res.status(400).json({
             msg:'Correo ya existe'
         })*/
-        throw new Error(`El email ${email} ingresado ya existe`);
+        throw new Error(`El correo ${email},  ingresado ya existe`);
     }
 }
 
