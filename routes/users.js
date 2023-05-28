@@ -3,7 +3,7 @@ const { Router } = require('express'); // desestrcuturamos de express la funcion
 const { usersGet, usersPut, usersPOST, usersDelete, usersPatch } = require('../controllers/users');
 const { check } = require('express-validator');
 const { validateFields } = require('../middleware/middleware');
-const { roleIsValid, emailIsValid } = require('../helpers/db-validators');
+const { roleIsValid, emailIsValid, idFind } = require('../helpers/db-validators');
 const { Error } = require('mongoose');
 //end require
 
@@ -17,7 +17,12 @@ const router = new Router();
 //GET
 router.get('/', usersGet);
 //PUT
-router.put('/:id', usersPut); //en el caso de que quiera recibir un parametro de un request por la ruta podria colocarlo aqui directamente
+router.put('/:id', [
+    check('id', 'No es un ID valido').isMongoId(), // isMongoId me permite evaluar el ID en la base de datos si existe para indicar si es valido o no
+    check('id').custom(id => idFind(id)),
+    check('role').custom((role) => roleIsValid(role)),
+    validateFields
+],  usersPut); //en el caso de que quiera recibir un parametro de un request por la ruta podria colocarlo aqui directamente
 //POST
 router.post('/', [
     check('name', 'nombre no puede estar vacio').notEmpty().escape(),
@@ -37,7 +42,11 @@ router.post('/', [
 ], usersPOST); // cuando queremos realizar el envio de un middleware podemos hacerlo a traves de la ruta
 // en este caso el check es una funcion del express-validator y se usa para comprobar si algo es valido o no check(campo a comprobar, mensaje de salida)
 //DELETE
-router.delete('/', usersDelete);
+router.delete('/:id', [
+    check('id', 'No es un ID valido').isMongoId(), // isMongoId me permite evaluar el ID en la base de datos si existe para indicar si es valido o no
+    check('id').custom(id => idFind(id)),
+    validateFields
+    ], usersDelete);
 //PATCH
 router.patch('/', usersPatch);
 

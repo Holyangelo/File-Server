@@ -17,11 +17,19 @@ const emailIsValid = async(email = '') => {
         /*return res.status(400).json({
             msg:'Correo ya existe'
         })*/
-        throw new Error(`El correo ${email},  ingresado ya existe`);
+        throw new Error(`El correo ${email} ingresado ya existe`);
+    }
+}
+
+const idFind = async(id = '') => {
+    const userExist = await User.findById( id );
+    if( !userExist ){
+        throw new Error(`El ID ${ id } ingresado no existe`);
     }
 }
 
 module.exports = {
     roleIsValid,
-    emailIsValid
+    emailIsValid,
+    idFind
 }

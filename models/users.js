@@ -24,7 +24,7 @@ const userSchema = Schema({
     role: {
         type: String,
         required: [true, 'Debe ingresar un rol'],
-        enum: ['ADMIN_ROLE', 'MOD_ROLE']
+        enum: ['ADMIN_ROLE', 'MOD_ROLE', 'IT_ROLE']
     },
     status: {
         type: Boolean,

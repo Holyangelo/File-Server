@@ -8,11 +8,19 @@ const { emailIsValid } = require('../helpers/db-validators');
 //end requires
 
 //creamos los controladores para cada una de las rutas
-const usersGet = (req, res = response) => {// aqui yo no tengo el app, por lo cual debo llamarlo como this.app
+const usersGet = async(req = request, res = response) => {// aqui yo no tengo el app, por lo cual debo llamarlo como this.app
     //extraemos los params de lo que enviemos en la query de la ruta
     //const query = req.query;
-    const { name = "no name", api_key, q, page_origin = 1, limit } = req.query;
-    res.json({
+    //forma de hacer el get sin db
+    //const { name = "no name", api_key, q, page_origin = 1, limit } = req.query;
+    //Si quiero obtener los argumentos que vienen en el query del link para el request puedo hacerlo usando const { arg } = req.query
+    const { limit = 4, init = 0} = req.query;
+    //GET - todos los usuarios que se encuentran en la db
+    const queries = { status:true };
+    /*const users = await User.find({ status:true }) // dentro del find({condicion}) podemos enviar las condiciones de busqueda
+    .skip(Number(init))
+    .limit(Number(limit));*/
+    /*res.json({
         code: 200,
         message: 'You are use GET request - Controller',
         name,
@@ -20,16 +28,44 @@ const usersGet = (req, res = response) => {// aqui yo no tengo el app, por lo cu
         q,
         page_origin,
         limit
+    });*/
+    /*const total = await User.countDocuments({ status:true });*/// dentro del countDocuments({condicion}) podemos enviar las condiciones de busqueda
+    //podemos realizar una desestructuracion de arreglos para darle nombre a las promesas segun su posicion
+    const [total, users] = await Promise.all([// puedo crear una coleccion de promesas await para que sean un unico tiempo de carga y sea mas rapido el proceso
+    //User.countDocuments({ status:true }),
+    //User.find({ status:true }) // dentro del find({condicion}) podemos enviar las condiciones de busqueda
+    User.countDocuments(queries),
+    User.find(queries)
+    .skip(Number(init))
+    .limit(Number(limit))
+    ]);
+
+    res.json({
+        //total,
+        //users
+        //resp
+        total, 
+        users
     });
 }
 // PUT
-const usersPut = (req, res = response) => {// aqui yo no tengo el app, por lo cual debo llamarlo como this.app
+const usersPut = async(req, res = response) => {// aqui yo no tengo el app, por lo cual debo llamarlo como this.app
     //body request
     const { id } = req.params;
+    const { _id, google, password, email,  ...rest } = req.body;
+
+    // Validar contra DB
+    if(password){
+    //creamos un salt: numero de vueltas para generar la encriptacion
+    const salt = bcryptjs.genSaltSync();
+    rest.password = bcryptjs.hashSync( password, salt ); //hash es para encriptarlo en una sola vias
+    }
+    //actualizar registro
+    const user = await User.findByIdAndUpdate( id, rest); // esta funcion me permite buscar un registro por el id y actualizarlo
     res.json({
         code: 200,
         message: 'You are use PUT request - Controller',
-        id: id
+        user
     });
 }
 //POST
@@ -66,10 +102,15 @@ const usersPOST = async (req, res = response) => {// aqui yo no tengo el app, po
     });
 }
 //DELETE
-const usersDelete = (req, res = response) => {// aqui yo no tengo el app, por lo cual debo llamarlo como this.app
+const usersDelete = async (req = request, res = response) => {// aqui yo no tengo el app, por lo cual debo llamarlo como this.app
+    const { id } = req.params;
+    //borrar fisicamente de la base de datos
+    //const user = await User.findByIdAndDelete(id);
+    const user = await User.findByIdAndUpdate(id, { status:false }); // puedo colocar el campo a actualizar en el mismo findByIdAndUpdate
     res.json({
         code: 200,
-        message: 'You are use DELETE request - Controller'
+        message: 'You are use DELETE request - Controller',
+        user
     });
 }
 //PATCH
