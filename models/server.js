@@ -14,6 +14,9 @@ class Server { //class server name
         //anexamos el puerto
         this.port = process.env.PORT;
 
+        //Autenticacion
+        this.authPath = '/auth';
+
         //ruta de los usuarios (solo como referencia, no es obligatorio)
         this.usersPath = '/users';
 
@@ -44,6 +47,8 @@ class Server { //class server name
     }
 
     routes() { // creamos esta funcion llamada rutas, aqui vamos a crear todas las rutas de nuetra app
+        //auth path
+        this.app.use(this.authPath, require('../routes/auth'));
         //main function
         this.app.use(this.usersPath, require('../routes/users')); //configuramos el acceso a las rutas usando app.use('apuntar a donde se hara la peticion', require(lugar donde se encuentran las rutas)
         /* this.app.get('/hello-world', (req, res) => {// aqui yo no tengo el app, por lo cual debo llamarlo como this.app
