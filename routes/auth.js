@@ -3,7 +3,7 @@ const { Router } = require('express'); // desestrcuturamos de express la funcion
 const { check } = require('express-validator');
 const { Error } = require('mongoose');
 const { login } = require('../controllers/auth');
-const { validateFields } = require('../middleware/middleware');
+const { validateFields } = require('../middleware/validate-field');
 //end require
 
 //instanciamos

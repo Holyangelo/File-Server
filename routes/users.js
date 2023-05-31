@@ -2,7 +2,10 @@
 const { Router } = require('express'); // desestrcuturamos de express la funcion Router para comenzar a manejar nuestras rutas
 const { usersGet, usersPut, usersPOST, usersDelete, usersPatch } = require('../controllers/users');
 const { check } = require('express-validator');
-const { validateFields } = require('../middleware/middleware');
+/*const { validateFields } = require('../middleware/middleware');
+const { validateJWT } = require('../middleware/validate-jwt');
+const { isAdminRole, validateRole } = require('../middleware/validate-role');*/
+const {validateFields,  validateJWT, isAdminRole, validateRole } = require('../middleware');
 const { roleIsValid, emailIsValid, idFind } = require('../helpers/db-validators');
 const { Error } = require('mongoose');
 //end require
@@ -43,6 +46,9 @@ router.post('/', [
 // en este caso el check es una funcion del express-validator y se usa para comprobar si algo es valido o no check(campo a comprobar, mensaje de salida)
 //DELETE
 router.delete('/:id', [
+    validateJWT,
+    //isAdminRole, //obliga al usuario a ser admin
+    validateRole('ADMIN_ROLE', 'IT_ROLE'),
     check('id', 'No es un ID valido').isMongoId(), // isMongoId me permite evaluar el ID en la base de datos si existe para indicar si es valido o no
     check('id').custom(id => idFind(id)),
     validateFields

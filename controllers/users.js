@@ -3,7 +3,7 @@ const { response, request } = require('express');
 const bcryptjs = require('bcryptjs')
 const User = require('../models/users'); // es un estandar que se importe con la primera letra en mayus
 const { validationResult } = require('express-validator');
-const { validateFields } = require('../middleware/middleware');
+const { validateFields } = require('../middleware/validate-field');
 const { emailIsValid } = require('../helpers/db-validators');
 //end requires
 
@@ -104,13 +104,19 @@ const usersPOST = async (req, res = response) => {// aqui yo no tengo el app, po
 //DELETE
 const usersDelete = async (req = request, res = response) => {// aqui yo no tengo el app, por lo cual debo llamarlo como this.app
     const { id } = req.params;
+    //esto solo se hace despues de modificar el uid de la request en validate-jwt.js, extraemos el uid
+    const uid = req.uid;
     //borrar fisicamente de la base de datos
     //const user = await User.findByIdAndDelete(id);
     const user = await User.findByIdAndUpdate(id, { status:false }); // puedo colocar el campo a actualizar en el mismo findByIdAndUpdate
+    //obtenemos la informacion del usuario
+    const userAuth = req.userAuth;
     res.json({
         code: 200,
         message: 'You are use DELETE request - Controller',
-        user
+        user,
+        uid,
+        userAuth
     });
 }
 //PATCH

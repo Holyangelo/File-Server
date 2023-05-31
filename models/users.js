@@ -40,7 +40,8 @@ const userSchema = Schema({
 //en una funcion de flecha no podemos usar this, por eso esta funcion es normal
 userSchema.methods.toJSON = function(){
     // estoy desestructurando el objeto en sus componentes, { version, el campo que quiero modificar, el campo donde quiero aconglomerar todo}
-    const { __v, password, ...user } = this.toObject();
+    const { __v, password, _id, ...user } = this.toObject();
+    user.uid = _id;
     return user;
 }
 
