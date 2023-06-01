@@ -11,15 +11,81 @@
     <title></title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="">
+    <link rel="stylesheet" href="css/style.css">
 </head>
 
 <body>
     <!--[if lt IE 7]>
             <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="#">upgrade your browser</a> to improve your experience.</p>
         <![endif]-->
-    <h1>Welcome to Server</h1>
+      <div class="container">
+      <div class="card">
+        <h1 class="title">Designed For Work</h1>
+        <p class="subtitle">Introducing the first ever 5G enabled tablet. You've got a tablet that
+          let's you play harder and work smarter.</p>
+          <div id="g_id_onload"
+         data-client_id="250562858252-4v20p6r30f2b6itj6bvn2ga7b1f9u1q6.apps.googleusercontent.com"
+         data-callback="handleCredentialResponse">
+         </div>
+         <div class="g_id_signin"
+         data-type="standard"
+         data-size="large"
+         data-theme="outline"
+         data-text="sign_in_with"
+         data-shape="rectangular"
+         data-logo_alignment="left">
+         </div>
+         <br>
+        <button class="btn" id="google_signout">SignOut</button>
+      </div>
+      <div class="blob"></div>
+    </div>
+
+    <!-- Scripts -->
     <script src="" async defer></script>
+    <!-- Google Signin -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <!-- HandleCredentials -->
+    <script>
+        function handleCredentialResponse(response) {
+     // decodeJwtResponse() is a custom function defined by you
+     // to decode the credential response.
+     //const responsePayload = decodeJwtResponse(response.credential);
+     //Google token : ID_TOKEN
+     //console.log('id_token',response.credential);
+            const body = { id_token: response.credential };
+     //enviamos los datos al servidor mediante fetch
+     fetch('http://localhost:3000/auth/google', { // para realizar esta operacion requerimos transformar el fetch de GET  a POST
+        method:'POST',
+        headers:{ // enviamos los headers para especificar el tipo de contenido que estamos enviando el cual es JSON
+            'Content-type':'application/json'
+        },
+        body : JSON.stringify(body) // el body debe estar serializado como un JSON
+     })
+     .then( resp => resp.json())
+     .then( resp => {
+        console.log(resp);
+        location.reload();
+        //con este metodo podemos guardar informacion en el local storage y nombrarla como nosotros deseemos en el primer argumento
+        //localstorage.setItem('nombre que le queremos dar', variable que vamos a guardar)
+        localStorage.setItem('email', resp.user.email);
+     })
+     .catch(console.warn);
+  }
+  //llamamos al boton
+  const signOut = document.getElementById('google_signout');
+  //anadimos el listener
+  signOut.onclick = () =>{
+    console.log(google.accounts.id);
+    //con este metodo deshabilitamos la autoseleccion
+    google.accounts.id.disableAutoSelect();
+    //con este metodo revocamos el acceso al usuario para que pueda desloguear
+    google.accounts.id.revoke( localStorage.getItem('email'), done => { // aqui podemos llamar la informacion guardada en el localstorage usando getItem(parametro que nombramos)
+        localStorage.clear();
+        location.reload();
+    });
+  }
+</script>
 </body>
 
 </html>

@@ -2,7 +2,7 @@
 const { Router } = require('express'); // desestrcuturamos de express la funcion Router para comenzar a manejar nuestras rutas
 const { check } = require('express-validator');
 const { Error } = require('mongoose');
-const { login } = require('../controllers/auth');
+const { login, googleSignIn } = require('../controllers/auth');
 const { validateFields } = require('../middleware/validate-field');
 //end require
 
@@ -16,6 +16,12 @@ router.post('/login',[
 	check('password', 'password es obligatorio').notEmpty(),
 	validateFields
 	], login);
+
+//POST for new path '/login'
+router.post('/google',[
+	check('id_token', 'token es necesario').notEmpty(),
+	validateFields
+	], googleSignIn);
 
 
 //exports 
