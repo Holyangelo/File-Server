@@ -65,7 +65,6 @@
      .then( resp => resp.json())
      .then( resp => {
         console.log(resp);
-        location.reload();
         //con este metodo podemos guardar informacion en el local storage y nombrarla como nosotros deseemos en el primer argumento
         //localstorage.setItem('nombre que le queremos dar', variable que vamos a guardar)
         localStorage.setItem('email', resp.user.email);

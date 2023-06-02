@@ -1,6 +1,7 @@
 //require
 const Role = require('../models/roles');
 const User = require('../models/users'); // es un estandar que se importe con la primera letra en mayus
+const Category = require('../models/category');
 //end require
 
 //funcion para validar rol
@@ -28,8 +29,16 @@ const idFind = async(id = '') => {
     }
 }
 
+const validateCategory = async(id = '') =>{
+    const categoryExist = await Category.findById( id );
+    if( !categoryExist ){
+        throw new Error(`El ID ${ id } ingresado no existe`);
+    }
+}
+
 module.exports = {
     roleIsValid,
     emailIsValid,
-    idFind
+    idFind,
+    validateCategory
 }

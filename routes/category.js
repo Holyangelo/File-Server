@@ -3,8 +3,17 @@ const { Router } = require('express'); // desestrcuturamos de express la funcion
 const { check } = require('express-validator');
 const { Error } = require('mongoose');
 const { login, googleSignIn } = require('../controllers/auth');
-const { validateFields } = require('../middleware/validate-field');
+const User = require('../models/users');
+const {validateFields,  validateJWT, isAdminRole, validateRole } = require('../middleware');
+const { categoryCreate, categoryGet, categoryGetId, categoryGetIdByUser } = require('../controllers/category');
+const { validateCategory, idFind } = require('../helpers/db-validators');
 //end require
+
+//tarea
+//obtener categorias - paginado - populate
+//obtener categorias  - populate {}
+//actualizar categoria
+//borrar categoria
 
 //instanciamos
 const router = new Router();
@@ -12,25 +21,46 @@ const router = new Router();
 
 //main
 //obtener todas las categorias y es un servicio un publico
-router.get('/', ( req, res )=> {
+router.get('/', categoryGet /*( req, res )=> {
 	res.status(200).json({
 		msg: 'GET - OK'
 	})
-});
+}*/);
 
 //obtener todas las categorias mediante un id
-router.get('/:id', ( req, res )=> {
+router.get('/:id', [
+	validateJWT,
+	check('id', 'invalid id').isMongoId(),
+	check('id').custom(id => validateCategory(id)),
+	validateFields
+	], categoryGetId /*( req, res )=> {
 	res.status(200).json({
 		msg: 'GETID - OK'
 	})
-});
+}*/);
+
+//obtener los datos de las categorias creadas por un usuario
+router.get('/u/:id', [
+	validateJWT,
+	check('id', 'invalid id').isMongoId(),
+	check('id').custom(id => idFind(id)),
+	validateFields
+	], categoryGetIdByUser /*( req, res )=> {
+	res.status(200).json({
+		msg: 'GETID - OK'
+	})
+}*/);
 
 //crear una categorias mediante un id
-router.post('/', ( req, res )=> {
+router.post('/', [
+	validateJWT,
+	check('name', 'the name is required').notEmpty(),
+	validateFields
+	], categoryCreate /*( req, res )=> {
 	res.status(200).json({
 		msg: 'POST - OK'
 	})
-});
+}*/);
 
 //actualizar una categoria mediante un id
 router.put('/:id', ( req, res )=> {

@@ -10,4 +10,4 @@ const roleSchema = Schema({
 });
 
 //exports area
-module.exports = model('roles', roleSchema )
+module.exports = model('roles', roleSchema );
