@@ -218,11 +218,25 @@ const categoryPut = async(req, res = response) => {// aqui yo no tengo el app, p
     });
 }
 
+//DELETE
+const categoryDelete = async (req = request, res = response) => {// aqui yo no tengo el app, por lo cual debo llamarlo como this.app
+    const { id } = req.params;
+    //borrar fisicamente de la base de datos
+    //const user = await User.findByIdAndDelete(id);
+    const deleteCategory = await Category.findByIdAndUpdate(id, { status:false }); // puedo colocar el campo a actualizar en el mismo findByIdAndUpdate
+    res.json({
+        code: 200,
+        message: 'You are use DELETE request - Controller',
+        deleteCategory
+    });
+}
+
 //exports
 module.exports = {
 	categoryCreate,
 	categoryGet, 
 	categoryGetId,
 	categoryGetIdByUser,
-	categoryPut
+	categoryPut,
+	categoryDelete
 }
