@@ -203,7 +203,8 @@ const categoryPut = async(req, res = response) => {// aqui yo no tengo el app, p
     //body request
     const { id } = req.params;
     const { name } = req.body;
-    if (await Category.findOne({ _id: id, name: name })) {// aqui estoy evaluando si la categoria ya posee el nombre por el cual quiero actualizar
+    const queries = { _id: id, name: name };
+    if (await Category.findOne(queries)) {// aqui estoy evaluando si la categoria ya posee el nombre por el cual quiero actualizar
     	// statement
     	return res.status(400).json({
     		msg: `category name ${name} already exists in DB`
