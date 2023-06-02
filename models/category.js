@@ -24,7 +24,7 @@ const  categorySchema = Schema({
 //en una funcion de flecha no podemos usar this, por eso esta funcion es normal
 categorySchema.methods.toJSON = function(){
     // estoy desestructurando el objeto en sus componentes, { version, el campo que quiero modificar, el campo donde quiero aconglomerar todo}
-    const { __v, ...category } = this.toObject();
+    const { __v, status, ...category } = this.toObject();
     //user.uid = _id;
     return category;
 }

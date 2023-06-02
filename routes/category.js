@@ -5,7 +5,7 @@ const { Error } = require('mongoose');
 const { login, googleSignIn } = require('../controllers/auth');
 const User = require('../models/users');
 const {validateFields,  validateJWT, isAdminRole, validateRole } = require('../middleware');
-const { categoryCreate, categoryGet, categoryGetId, categoryGetIdByUser } = require('../controllers/category');
+const { categoryCreate, categoryGet, categoryGetId, categoryGetIdByUser, categoryPut } = require('../controllers/category');
 const { validateCategory, idFind } = require('../helpers/db-validators');
 //end require
 
@@ -40,7 +40,7 @@ router.get('/:id', [
 }*/);
 
 //obtener los datos de las categorias creadas por un usuario
-router.get('/u/:id', [
+router.get('/user/:id', [
 	validateJWT,
 	check('id', 'invalid id').isMongoId(),
 	check('id').custom(id => idFind(id)),
@@ -63,11 +63,17 @@ router.post('/', [
 }*/);
 
 //actualizar una categoria mediante un id
-router.put('/:id', ( req, res )=> {
+router.put('/:id', [
+	validateJWT,
+	check('id', 'No es un ID valido').isMongoId(), // isMongoId me permite evaluar el ID en la base de datos si existe para indicar si es valido o no
+	check('id', 'category not exist').custom( id => validateCategory(id)),
+	isAdminRole,
+	validateFields
+	], categoryPut /*( req, res )=> {
 	res.status(200).json({
 		msg: 'PUT - OK'
 	})
-});
+}*/);
 
 //borrar una categoria mediante un id
 router.delete('/:id', ( req, res )=> {

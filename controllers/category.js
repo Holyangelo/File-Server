@@ -36,10 +36,16 @@ const categoryGet = async(req = request, res = response) => {// aqui yo no tengo
     //User.find({ status:true }) // dentro del find({condicion}) podemos enviar las condiciones de busqueda
     Category.countDocuments(queries),
     Category.find(queries)
+    .populate('user', 'name')
     .skip(Number(init))
     .limit(Number(limit))
     ]);
-
+    if (total === 0 ) {
+    	// statement
+    	return res.status(404).json({
+    		msg:'not found categories'
+    });
+    }
     res.json({
         //total,
         //users
@@ -84,9 +90,15 @@ const categoryGetId = async(req = request, res = response) => {// aqui yo no ten
     //User.find({ status:true }) // dentro del find({condicion}) podemos enviar las condiciones de busqueda
     Category.countDocuments(queries),
     Category.find(queries)
-    .populate('user')
+    .populate('user', 'name')
     .exec()
     ]);
+    if (total === 0 ) {
+    	// statement
+    	return res.status(404).json({
+    		msg:`not found categories for Id ${ queries }`
+    });
+    }
     res.json({
         //total,
         //users
@@ -132,7 +144,7 @@ const categoryGetIdByUser = async(req = request, res = response) => {// aqui yo 
     //User.find({ status:true }) // dentro del find({condicion}) podemos enviar las condiciones de busqueda
     Category.countDocuments(queries),
     Category.find(queries)
-    .populate('user')
+    .populate('user', 'name')
     .exec()
     ]);
     if (total === 0 ) {
@@ -141,12 +153,15 @@ const categoryGetIdByUser = async(req = request, res = response) => {// aqui yo 
     		msg:'not found categories for this user'
     });
     }
+    //const valor = Object.values(categories);
+    //const { name, email } = valor[0].user;
+    const { __v, ...resCategory } = categories;
     res.json({
         //total,
         //users
         //resp
         total,
-        categories
+       resCategory
     });
 }
 
@@ -183,10 +198,31 @@ const categoryCreate = async(req = request, res = response) =>{
 	}
 }
 
+//PUT
+const categoryPut = async(req, res = response) => {// aqui yo no tengo el app, por lo cual debo llamarlo como this.app
+    //body request
+    const { id } = req.params;
+    const { name } = req.body;
+    if (await Category.findOne({ _id: id, name: name })) {// aqui estoy evaluando si la categoria ya posee el nombre por el cual quiero actualizar
+    	// statement
+    	return res.status(400).json({
+    		msg: `category name ${name} already exists in DB`
+    	});
+    }
+    //actualizar registro
+    const updateCategory = await Category.findByIdAndUpdate( id, { name : name }); // esta funcion me permite buscar un registro por el id y actualizarlo
+    res.json({
+        code: 200,
+        message: 'You are use PUT request - Controller',
+        updateCategory
+    });
+}
+
 //exports
 module.exports = {
 	categoryCreate,
 	categoryGet, 
 	categoryGetId,
-	categoryGetIdByUser
+	categoryGetIdByUser,
+	categoryPut
 }
