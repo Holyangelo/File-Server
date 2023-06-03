@@ -1,6 +1,7 @@
 //require
 const Role = require('../models/roles');
 const User = require('../models/users'); // es un estandar que se importe con la primera letra en mayus
+const Product = require('../models/product'); // es un estandar que se importe con la primera letra en mayus
 const Category = require('../models/category');
 //end require
 
@@ -36,9 +37,30 @@ const validateCategory = async(id = '') =>{
     }
 }
 
+const validateProduct = async(id = '') =>{
+    const productExist = await Product.findById( id );
+    if( !productExist ){
+        throw new Error(`El ID ${ id } ingresado no existe`);
+    }
+}
+
+//funcion para validar rol
+const validateProductExist = async(name = '') => {
+    const productExist = await Product.findOne({ name });
+    if(productExist){
+        /*return res.status(400).json({
+            msg:'Correo ya existe'
+        })*/
+        throw new Error(`El Product ${name} ingresado ya existe`);
+    }
+}
+
+
 module.exports = {
     roleIsValid,
     emailIsValid,
     idFind,
-    validateCategory
+    validateCategory,
+    validateProduct,
+    validateProductExist
 }

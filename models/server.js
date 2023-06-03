@@ -19,7 +19,8 @@ class Server { //class server name
         this.paths = {
             authPath : '/auth',
             categoryPath : '/category',
-            usersPath : '/users'
+            usersPath : '/users',
+            productPath : '/product'
         }
 
         //Autenticacion
@@ -64,7 +65,8 @@ class Server { //class server name
         this.app.use(this.paths.categoryPath, require('../routes/category'));
         //users function
         this.app.use(this.paths.usersPath, require('../routes/users'));
-        //auth path
+        //product path
+        this.app.use(this.paths.productPath, require('../routes/product'));
         //this.app.use(this.authPath, require('../routes/auth'));
         //category path
         //this.app.use(this.categoryPath, require('../routes/category'));
