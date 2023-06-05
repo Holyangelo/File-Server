@@ -1,6 +1,7 @@
 //require
 const express = require('express');
-const cors = require('cors')
+const cors = require('cors');
+const fileUpload = require('express-fileupload');
 const { dbConnection } = require('../database/config');
 //end require
 
@@ -21,7 +22,8 @@ class Server { //class server name
             categoryPath : '/category',
             usersPath : '/users',
             productPath : '/product',
-            findPath : '/find'
+            findPath : '/find',
+            uploadPath : '/uploads'
         }
 
         //Autenticacion
@@ -57,6 +59,13 @@ class Server { //class server name
         this.app.use(express.json());
         //middleware para public
         this.app.use(express.static('public')); //el "use" es el elemento clave para la creacion de los middlewares
+        // Note that this option available for versions 1.0.0 and newer. 
+        this.app.use(fileUpload({ // middleware para el manejo de carga de archivos en el servidor NOTA: si en la documentacion de algun paquete
+            //vemos que dice algun codigo app.use sabemos que es un middleware y depende de nosotros donde lo implementamos
+            useTempFiles: true,
+            tempFileDir: '/tmp/',
+            createParentPath: true
+        }));
     }
 
     routes() { // creamos esta funcion llamada rutas, aqui vamos a crear todas las rutas de nuetra app
@@ -70,6 +79,8 @@ class Server { //class server name
         this.app.use(this.paths.productPath, require('../routes/product'));
         //find path
         this.app.use(this.paths.findPath, require('../routes/find'))
+        //uploads path
+        this.app.use(this.paths.uploadPath, require('../routes/uploads'));
         //this.app.use(this.authPath, require('../routes/auth'));
         //category path
         //this.app.use(this.categoryPath, require('../routes/category'));
