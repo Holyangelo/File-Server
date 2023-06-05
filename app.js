@@ -11,4 +11,3 @@ const server = new Server();
 
 //llamamos el servidor
 server.listen();
-
