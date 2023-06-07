@@ -5,7 +5,7 @@ const { Error } = require('mongoose');
 const { login, googleSignIn } = require('../controllers/auth');
 const { validateFields, validateJWT, validateFile } = require('../middleware');
 const { validateCategory, validateProduct, allowedCollections } = require('../helpers');
-const { uploadFile, getImage, updateImage } = require('../controllers/uploads');
+const { uploadFile, getImage, updateImage, updateImageCloudinary } = require('../controllers/uploads');
 //end require
 
 //instanciamos
@@ -30,6 +30,16 @@ router.post('/',[
 	], uploadFile);
 
 //PUT
+/*router.put('/:collection/:id', [
+	validateJWT,
+	check('id', 'invalid id').isMongoId(),
+	check('id', 'id is not empty').notEmpty(),
+	check('collection').custom( c => allowedCollections(c, ['users', 'categories', 'products'])),
+	validateFile,
+	validateFields
+	], updateImage);*/
+
+//PUT
 router.put('/:collection/:id', [
 	validateJWT,
 	check('id', 'invalid id').isMongoId(),
@@ -37,7 +47,7 @@ router.put('/:collection/:id', [
 	check('collection').custom( c => allowedCollections(c, ['users', 'categories', 'products'])),
 	validateFile,
 	validateFields
-	], updateImage);
+	], updateImageCloudinary);
 
 //exports
 module.exports = router;

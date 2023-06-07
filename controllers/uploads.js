@@ -3,8 +3,16 @@ const { response, request } = require('express');
 const { uploadFiles } = require('../helpers');
 const fs = require('fs');
 const path = require('path'); // importamos el path para crear el url, esto es propio de node
+const cloudinary = require('cloudinary').v2;
 const { User, Product, Category } = require('../models');
 //end require
+
+//CONFIGURAMOS CLOUDINARY
+cloudinary.config({ 
+  cloud_name: 'drliparhg', 
+  api_key: '192522591581817', 
+  api_secret: 'z1PiOjJADdK-rur-iC-wBTC54No' 
+});
 
 //Upload File
 const uploadFile = async(req, res = response) =>{
@@ -27,6 +35,108 @@ const uploadFile = async(req, res = response) =>{
     // statements
     console.log(msg);
     res.status(400).json({msg});
+  }
+}
+
+//UPLOAD CLOUDINARY
+const updateImageCloudinary = async(req, res = response) =>{
+  //extramos los datos que necesitaremos para actualizar
+  const { id, collection, file } = req.params;
+  //establecemos una variable con un valor condicional
+  let model; 
+  //switch
+  switch (collection) {
+    //users
+    case 'users':
+      // statements_1
+      model = await User.findById(id);
+      if (!model) {
+        // statement
+        return res.status(401).json({
+          msg:`the id  ${id} not exists `
+        })
+      }
+      break;
+      //products
+      case 'products':
+      // statements_1
+      model = await Product.findById(id);
+      if (!model) {
+        // statement
+        return res.status(401).json({
+          msg:`the id  ${id} not exists `
+        })
+      }
+      break;
+      //categories
+      case 'categories':
+      // statements_1
+        console.log(id);
+      model = await Category.findById(id);
+      if (!model) {
+        // statement
+        return res.status(401).json({
+          msg:`the id  ${id} not exists `
+        })
+      }
+      break;
+    default:
+      // statements_def
+      res.status(500).json({
+        msg:'this is not validate'
+      });
+      break;
+  }
+  //limpiar imagenes previas
+  try {
+    // statements
+    /*if (model.img) {// si la propiedad img del producto o usuario existe
+      // statement
+      //removemos la imagen previa
+      //path join (direccion del servidor, carpeta destino, nombre de la coleccion, nombre de la imagen)
+      const imagePath = path.join( __dirname, '../uploads', collection, model.img );
+      if (fs.existsSync(imagePath)){// existsSync verifica si el archivo existe en la ruta que le estoy pasando
+        fs.unlinkSync(imagePath);// unlinkSync borra el archivo
+      }
+    }*/
+    //limpiar imagenes de cloudinary
+    if (model.img) {// si la propiedad img del producto o usuario existe
+      // statement
+      const nameArr = model.img.split('/');
+      //obtenemos la ultima posicion del arreglo
+      const name = nameArr[ nameArr.length - 1 ];
+      //cortamos el nombre 
+      const [ public_id ] = name.split('.');//aqui obtenemos el nombre unicamente sin la extension, ya que cortamos todo del .jpg
+      //removemos la imagen previa
+      //path join (direccion del servidor, carpeta destino, nombre de la coleccion, nombre de la imagen)
+      //borramos de cloudinary
+      await cloudinary.uploader.destroy(public_id);
+    }
+    //desestructuramos el path temporal en el cual se encuentra almacenada la imagen
+    console.log(req.files.file); //objeto de la imagen
+    const { tempFilePath } = req.files.file;
+    //subir a cloudinary
+    /*const uploadTemp = await cloudinary.uploader.upload(tempFilePath);
+    const url = uploadTemp.url;
+    res.status(200).json({
+      url
+    })*/
+    //desestructuramos el secure url
+    const { secure_url } = await cloudinary.uploader.upload(tempFilePath);
+    //const nameFile = await uploadFiles(req.files, undefined, collection);// coloco collection para forzar a crear una carpeta con el nombre de la coleccion
+    model.img = secure_url;
+    //guardamos o actualizamos
+    await model.save();
+    res.status(200).json({
+      request:{
+        id,
+        collection
+      },
+      model
+    });
+  } catch(e) {
+    // statements
+    console.log(e);
   }
 }
 
@@ -183,5 +293,6 @@ const updateImage = async (req, res = response) => {
 module.exports = {
 	uploadFile,
   updateImage,
-  getImage
+  getImage,
+  updateImageCloudinary
 }
