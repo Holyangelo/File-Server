@@ -55,6 +55,16 @@ const validateProductExist = async(name = '') => {
     }
 }
 
+//collections validate 
+const allowedCollections = (collection = '', collections = []) =>{
+    const include = collections.includes(collection);
+    if (!include) {
+        // statement
+        throw new Error(`the collection ${collection} is not allowed`);
+    }
+    return true;
+}
+
 
 module.exports = {
     roleIsValid,
@@ -62,5 +72,6 @@ module.exports = {
     idFind,
     validateCategory,
     validateProduct,
-    validateProductExist
+    validateProductExist,
+    allowedCollections
 }
